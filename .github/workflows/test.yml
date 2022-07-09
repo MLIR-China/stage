@@ -18,13 +18,13 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
           repository: llvm/llvm-project
           # please use a commit here
           path: llvm-src
-      - uses: actions/checkout@v2
       - uses: ./
         with:
           llvm-src: llvm-src
