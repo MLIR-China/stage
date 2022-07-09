@@ -1,10 +1,10 @@
-name: 'build-test'
+name: "build-test"
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
     branches:
       - main
-      - 'releases/*'
+      - "releases/*"
 
 jobs:
   build: # make sure build/ci work properly
@@ -18,7 +18,13 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout llvm/llvm-project
+        uses: actions/checkout@v2
+        with:
+          repository: llvm/llvm-project
+          # please use a commit here
+          path: llvm-src
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          milliseconds: 1000
+          llvm-src: llvm-src
