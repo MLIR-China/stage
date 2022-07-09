@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as os from 'os'
-
+import path from 'path'
 function cmakeArgs(): string[] {
   return [
     '-DLLVM_ENABLE_PROJECTS=mlir',
@@ -22,7 +22,10 @@ function prefixArgs(): string[] {
 async function run(): Promise<void> {
   try {
     const buildDir = 'build'
-    const llvmSrc: string = core.getInput('llvm-src', {required: true})
+    let llvmSrc: string = core.getInput('llvm-project-root-dir', {
+      required: true
+    })
+    llvmSrc = path.join(llvmSrc, 'llvm')
     await exec.exec(
       'cmake',
       ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']

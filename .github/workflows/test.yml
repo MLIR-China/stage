@@ -26,8 +26,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: llvm/llvm-project
-          path: llvm-src
+          path: llvm-project
           ref: main
       - uses: ./
         with:
-          llvm-src: llvm-src
+          llvm-project-root-dir: llvm-project

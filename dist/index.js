@@ -34,10 +34,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec = __importStar(__nccwpck_require__(514));
 const os = __importStar(__nccwpck_require__(87));
+const path_1 = __importDefault(__nccwpck_require__(622));
 function cmakeArgs() {
     return [
         '-DLLVM_ENABLE_PROJECTS=mlir',
@@ -58,7 +62,10 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const buildDir = 'build';
-            const llvmSrc = core.getInput('llvm-src', { required: true });
+            let llvmSrc = core.getInput('llvm-project-root-dir', {
+                required: true
+            });
+            llvmSrc = path_1.default.join(llvmSrc, 'llvm');
             yield exec.exec('cmake', ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']
                 .concat(cmakeArgs())
                 .concat(prefixArgs()));
