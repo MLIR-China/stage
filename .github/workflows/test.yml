@@ -27,6 +27,7 @@ jobs:
         with:
           repository: llvm/llvm-project
           path: llvm-src
+          ref: main
       - uses: ./
         with:
           llvm-src: llvm-src
