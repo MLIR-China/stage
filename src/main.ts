@@ -22,7 +22,7 @@ function prefixArgs(): string[] {
 async function run(): Promise<void> {
   try {
     const buildDir = 'build'
-    const llvmSrc: string = core.getInput('llvm-dir')
+    const llvmSrc: string = core.getInput('llvm-src', {required: true})
     await exec.exec(
       'cmake',
       ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']

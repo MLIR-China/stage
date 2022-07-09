@@ -58,7 +58,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const buildDir = 'build';
-            const llvmSrc = core.getInput('llvm-dir');
+            const llvmSrc = core.getInput('llvm-src', { required: true });
             yield exec.exec('cmake', ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']
                 .concat(cmakeArgs())
                 .concat(prefixArgs()));
