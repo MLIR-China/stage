@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: llvm/llvm-project
-          # please use a commit here
           path: llvm-src
       - uses: ./
         with:
