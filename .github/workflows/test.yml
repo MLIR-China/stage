@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-ninja@master
       - run: |
-          yum install -y ccache
+          apt install -y ccache
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
