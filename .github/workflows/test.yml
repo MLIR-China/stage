@@ -34,3 +34,10 @@ jobs:
       - uses: ./
         with:
           llvm-project-root-dir: llvm-project
+      - name: Zip the installation
+        run: |
+          zip -r llvm-install.zip $HOME/llvm-install
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: llvm-install.zip
