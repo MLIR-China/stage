@@ -37,7 +37,11 @@ jobs:
       - name: Zip the installation
         run: |
           zip -r llvm-install.zip $HOME/llvm-install
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H%M')"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: llvm-install.zip
+          tag_name: nightly-tag-${{ steps.date.outputs.date }}
