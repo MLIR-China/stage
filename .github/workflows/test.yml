@@ -36,7 +36,9 @@ jobs:
           llvm-project-root-dir: llvm-project
       - name: Zip the installation
         run: |
-          zip -r llvm-install.zip $HOME/llvm-install
+          CURRENT_DIR=$(pwd)
+          cd $HOME/llvm-install
+          zip -r ${CURRENT_DIR}/llvm-install.zip .
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H%M')"
