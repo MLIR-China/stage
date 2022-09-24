@@ -53,6 +53,8 @@ function cmakeArgs() {
         '-DLLVM_ENABLE_OCAMLDOC=OFF',
         '-DLLVM_ENABLE_BINDINGS=OFF',
         '-DLLVM_INSTALL_UTILS=ON',
+        '-DLLVM_ENABLE_ZLIB=OFF',
+        '-DLLVM_ENABLE_ZSTD=OFF'
     ];
 }
 function prefixArgs() {
