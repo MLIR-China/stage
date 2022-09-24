@@ -1,27 +1,17 @@
-name: "Build and release"
-on: # rebuild any PRs and main branch changes
-  pull_request:
+name: Auto release
+
+on:
+  schedule:
+    # every 3 hours
+    - cron: "0 */3 * * *"
   push:
     branches:
       - main
       - "releases/*"
-concurrency:
-  group: stage-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  build: # make sure build/ci work properly
+  release: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: |
-          npm install
-      - run: |
-          npm run all
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-ninja@master
       - run: |
           sudo apt install -y ccache
@@ -31,7 +21,7 @@ jobs:
           repository: llvm/llvm-project
           path: llvm-project
           ref: main
-      - uses: ./
+      - uses: MLIR-China/stage@main
         with:
           llvm-project-root-dir: llvm-project
       - name: Zip the installation
