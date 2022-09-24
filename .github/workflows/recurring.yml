@@ -1,0 +1,40 @@
+name: Auto release
+
+on:
+  schedule:
+    # every 3 hours
+    - cron: "0 */3 * * *"
+  push:
+    branches:
+      - main
+      - "releases/*"
+      - try-build
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: seanmiddleditch/gha-setup-ninja@master
+      - run: |
+          sudo apt install -y ccache
+      - name: Checkout llvm/llvm-project
+        uses: actions/checkout@v2
+        with:
+          repository: llvm/llvm-project
+          path: llvm-project
+          ref: main
+      - uses: MLIR-China/stage@main
+        with:
+          llvm-project-root-dir: llvm-project
+      - name: Zip the installation
+        run: |
+          CURRENT_DIR=$(pwd)
+          cd $HOME/llvm-install
+          zip -r ${CURRENT_DIR}/llvm-install.zip .
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H%M')"
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: llvm-install.zip
+          tag_name: nightly-tag-${{ steps.date.outputs.date }}
