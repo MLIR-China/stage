@@ -8,6 +8,7 @@ on:
     branches:
       - main
       - "releases/*"
+      - try-build
 jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
@@ -21,7 +22,7 @@ jobs:
           repository: llvm/llvm-project
           path: llvm-project
           ref: main
-      - uses: MLIR-China/stage@main
+      - uses: MLIR-China/stage@try-build
         with:
           llvm-project-root-dir: llvm-project
       - name: Zip the installation
