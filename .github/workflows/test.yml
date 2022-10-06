@@ -53,12 +53,14 @@ jobs:
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: Zip the installation
+        id: zip
         run: |
-          CURRENT_DIR=$(pwd)
+          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.build-type }}.zip
           cd $HOME/llvm-install
-          zip -r ${CURRENT_DIR}/llvm-install.zip .
+          zip -r ${ARCHIVE_PATH} .
+          echo ::set-output name=ARCHIVE_PATH::${ARCHIVE_PATH}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: llvm-install.zip
-          tag_name: nightly-tag-${{ matrix.build-type }}-${{ needs.generate_id.outputs.formatted_date }}
+          files: ${{ steps.zip.outputs.ARCHIVE_PATH }}
+          tag_name: nightly-tag-${{ needs.generate_id.outputs.formatted_date }}
