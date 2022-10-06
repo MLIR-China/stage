@@ -37,6 +37,11 @@ jobs:
         job:
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
     steps:
+      - name: Set Swap Space
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        uses: pierotofy/set-swap-space@v1.0
+        with:
+          swap-size-gb: 8
       - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-ninja@master
       - run: |
