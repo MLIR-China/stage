@@ -49,6 +49,7 @@ async function run(): Promise<void> {
       'cmake',
       ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']
         .concat(cmakeArgs())
+        .concat(userCmakeArgs)
         .concat(prefixArgs())
     )
     await exec.exec('cmake', ['--build', buildDir, '-t', 'install'])
