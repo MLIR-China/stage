@@ -19,7 +19,14 @@ jobs:
       - run: |
           npm run all
   test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.job.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: ["Debug", "Release", "RelWithDebInfo", "MinSizeRel"]
+        job:
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
     steps:
       - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-ninja@master
@@ -34,6 +41,8 @@ jobs:
       - uses: ./
         with:
           llvm-project-root-dir: llvm-project
+          cmake-args: |
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: Zip the installation
         run: |
           CURRENT_DIR=$(pwd)

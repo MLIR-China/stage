@@ -9,7 +9,6 @@ function cmakeArgs(): string[] {
     '-DCMAKE_C_COMPILER_LAUNCHER=ccache',
     '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache',
     '-DLLVM_ENABLE_ASSERTIONS=ON',
-    '-DCMAKE_BUILD_TYPE=Release',
     '-DLLVM_ENABLE_OCAMLDOC=OFF',
     '-DLLVM_ENABLE_BINDINGS=OFF',
     '-DLLVM_INSTALL_UTILS=ON',
@@ -29,6 +28,22 @@ async function run(): Promise<void> {
     let llvmSrc: string = core.getInput('llvm-project-root-dir', {
       required: true
     })
+    let userCmakeArgs = core.getMultilineInput('cmake-args', {
+      required: false
+    })
+    if (!userCmakeArgs) {
+      userCmakeArgs = []
+    }
+    let hasBuildType = false
+    for (const arg of userCmakeArgs) {
+      if (arg.includes('CMAKE_BUILD_TYPE')) {
+        hasBuildType = true
+        break
+      }
+    }
+    if (!hasBuildType) {
+      userCmakeArgs = userCmakeArgs.concat('-DCMAKE_BUILD_TYPE=Release')
+    }
     llvmSrc = path.join(llvmSrc, 'llvm')
     await exec.exec(
       'cmake',
