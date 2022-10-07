@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build-type: ["Debug", "Release", "RelWithDebInfo", "MinSizeRel"]
+        build-type: ["Release", "MinSizeRel"]
         job:
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
     steps:
