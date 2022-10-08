@@ -5,6 +5,9 @@ inputs:
   llvm-project-root-dir:
     required: true
     description: "llvm source directory"
+  cmake-args:
+    required: false
+    description: "cmake arguments"
 runs:
   using: "node16"
   main: "dist/index.js"

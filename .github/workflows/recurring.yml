@@ -9,9 +9,30 @@ on:
       - main
       - "releases/*"
 jobs:
-  release: # make sure the action works on a clean machine without building
+  generate_id:
+    name: Generate ID of release
     runs-on: ubuntu-latest
+    outputs:
+      formatted_date: ${{ steps.date.outputs.formatted_date }}
     steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=formatted_date::$(date +'%Y-%m-%d-%H%M')"
+  release: # make sure the action works on a clean machine without building
+    runs-on: ${{ matrix.job.os }}
+    needs: [generate_id]
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: ["Release", "MinSizeRel"]
+        job:
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
+    steps:
+      - name: Set Swap Space
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        uses: pierotofy/set-swap-space@v1.0
+        with:
+          swap-size-gb: 8
       - uses: seanmiddleditch/gha-setup-ninja@master
       - run: |
           sudo apt install -y ccache
@@ -24,16 +45,17 @@ jobs:
       - uses: MLIR-China/stage@main
         with:
           llvm-project-root-dir: llvm-project
+          cmake-args: |
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: Zip the installation
+        id: zip
         run: |
-          CURRENT_DIR=$(pwd)
+          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.build-type }}.zip
           cd $HOME/llvm-install
-          zip -r ${CURRENT_DIR}/llvm-install.zip .
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H%M')"
+          zip -r ${ARCHIVE_PATH} .
+          echo ::set-output name=ARCHIVE_PATH::${ARCHIVE_PATH}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: llvm-install.zip
-          tag_name: nightly-tag-${{ steps.date.outputs.date }}
+          files: ${{ steps.zip.outputs.ARCHIVE_PATH }}
+          tag_name: nightly-tag-${{ needs.generate_id.outputs.formatted_date }}
