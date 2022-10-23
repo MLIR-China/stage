@@ -39,18 +39,18 @@ jobs:
               target: arm-unknown-linux-gnueabihf,
               os: ubuntu-20.04,
               use-cross: true,
-              native-installation: "https://...",
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
             }
           - {
               target: aarch64-unknown-linux-gnu,
               os: ubuntu-20.04,
               use-cross: true,
-              native-installation: "https://...",
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
             }
           - {
               target: aarch64-apple-darwin,
               os: macos-11,
-              native-installation: "https://...",
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-apple-darwin-MinSizeRel.zip",
             }
           - { target: x86_64-apple-darwin, os: macos-11 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
@@ -58,7 +58,7 @@ jobs:
               target: x86_64-unknown-linux-musl,
               os: ubuntu-20.04,
               use-cross: true,
-              native-installation: "https://...",
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
             }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
@@ -77,13 +77,13 @@ jobs:
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           esac
       - uses: seanmiddleditch/gha-setup-ninja@master
-      # - name: Download pre-build LLVM
-      #   if: ${{ matrix.job.native-installation }}
-      #   run: |
-      #     wget --progress=bar:force:noscroll ${{ matrix.job.native-installation }} -O llvm-install.zip
-      #     unzip llvm-install.zip -d $HOME/native-llvm-install
-      #     rm llvm-install.zip
-      #     echo "NATIVE_LLVM_INSTALL=$HOME/native-llvm-install" >> $GITHUB_OUTPUT
+      - name: Download pre-build LLVM
+        if: ${{ matrix.job.native-installation }}
+        run: |
+          wget --progress=bar:force:noscroll ${{ matrix.job.native-installation }} -O llvm-install.zip
+          unzip llvm-install.zip -d $HOME/native-llvm-install
+          rm llvm-install.zip
+          echo "NATIVE_LLVM_INSTALL=$HOME/native-llvm-install" >> $GITHUB_OUTPUT
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
