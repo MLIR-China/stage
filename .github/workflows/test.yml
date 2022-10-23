@@ -108,12 +108,12 @@ jobs:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-            -DLLVM_TABLEGEN=${NATIVE_LLVM_INSTALL}/bin/llvm-tblgen
-            -DCLANG_TABLEGEN=${NATIVE_LLVM_INSTALL}/bin/clang-tblgen
-            -DMLIR_TABLEGEN=${NATIVE_LLVM_INSTALL}/bin/mlir-tblgen
-            -DMLIR_LINALG_ODS_GEN=${NATIVE_LLVM_INSTALL}/bin/mlir-linalg-ods-gen
-            -DMLIR_LINALG_ODS_YAML_GEN=${NATIVE_LLVM_INSTALL}/bin/mlir-linalg-ods-yaml-gen
-            -DLLVM_DEFAULT_TARGET_TRIPLE=arm-linux-gnueabihf
+            -DLLVM_TABLEGEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/llvm-tblgen
+            -DCLANG_TABLEGEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/clang-tblgen
+            -DMLIR_TABLEGEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/mlir-tblgen
+            -DMLIR_LINALG_ODS_GEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/mlir-linalg-ods-gen
+            -DMLIR_LINALG_ODS_YAML_GEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/mlir-linalg-ods-yaml-gen
+            -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
             -DLLVM_TARGET_ARCH=ARM
             -DLLVM_TARGETS_TO_BUILD=ARM
       - name: Zip the installation
