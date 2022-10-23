@@ -104,11 +104,11 @@ jobs:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-            -DLLVM_TABLEGEN=$NATIVE_LLVM_INSTALL/bin/llvm-tblgen
-            -DCLANG_TABLEGEN=$NATIVE_LLVM_INSTALL/bin/clang-tblgen
-            -DMLIR_TABLEGEN=$NATIVE_LLVM_INSTALL/bin/mlir-tblgen
-            -DMLIR_LINALG_ODS_GEN=$NATIVE_LLVM_INSTALL/bin/mlir-linalg-ods-gen
-            -DMLIR_LINALG_ODS_YAML_GEN=$NATIVE_LLVM_INSTALL/bin/mlir-linalg-ods-yaml-gen
+            -DLLVM_TABLEGEN=${NATIVE_LLVM_INSTALL}/bin/llvm-tblgen
+            -DCLANG_TABLEGEN=${NATIVE_LLVM_INSTALL}/bin/clang-tblgen
+            -DMLIR_TABLEGEN=${NATIVE_LLVM_INSTALL}/bin/mlir-tblgen
+            -DMLIR_LINALG_ODS_GEN=${NATIVE_LLVM_INSTALL}/bin/mlir-linalg-ods-gen
+            -DMLIR_LINALG_ODS_YAML_GEN=${NATIVE_LLVM_INSTALL}/bin/mlir-linalg-ods-yaml-gen
             -DLLVM_DEFAULT_TARGET_TRIPLE=arm-linux-gnueabihf
             -DLLVM_TARGET_ARCH=ARM
             -DLLVM_TARGETS_TO_BUILD=ARM
