@@ -92,17 +92,17 @@ jobs:
           unzip llvm-install.zip -d $HOME/native-llvm-install
           rm llvm-install.zip
           echo "NATIVE_LLVM_INSTALL=$HOME/native-llvm-install" >> $GITHUB_OUTPUT
+      - name: Checkout Tencent/ncnn
+        uses: actions/checkout@v2
+        with:
+          repository: Tencent/ncnn
+          path: ncnn
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
           repository: llvm/llvm-project
           path: llvm-project
           ref: main
-      - name: Checkout Tencent/ncnn
-        uses: actions/checkout@v2
-        with:
-          repository: Tencent/ncnn
-          path: ncnn
       - name: Build LLVM
         if: ${{ !matrix.job.native-installation }}
         uses: ./
