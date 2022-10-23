@@ -6,8 +6,6 @@ function cmakeArgs(): string[] {
   return [
     '-DLLVM_ENABLE_PROJECTS=mlir',
     '-DLLVM_TARGETS_TO_BUILD=host',
-    '-DCMAKE_C_COMPILER_LAUNCHER=ccache',
-    '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache',
     '-DLLVM_ENABLE_ASSERTIONS=ON',
     '-DLLVM_ENABLE_OCAMLDOC=OFF',
     '-DLLVM_ENABLE_BINDINGS=OFF',

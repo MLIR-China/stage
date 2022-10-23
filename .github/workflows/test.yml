@@ -70,10 +70,6 @@ jobs:
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           esac
       - uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Install apt deps
-        if: startsWith(runner.os, 'Linux')
-        run: |
-          sudo apt install -y ccache
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:

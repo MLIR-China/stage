@@ -34,8 +34,6 @@ jobs:
         with:
           swap-size-gb: 8
       - uses: seanmiddleditch/gha-setup-ninja@master
-      - run: |
-          sudo apt install -y ccache
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
