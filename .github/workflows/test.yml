@@ -40,17 +40,20 @@ jobs:
               os: ubuntu-20.04,
               use-cross: true,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnueabihf,
             }
           - {
               target: aarch64-unknown-linux-gnu,
               os: ubuntu-20.04,
               use-cross: true,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnueabihf,
             }
           - {
               target: aarch64-apple-darwin,
               os: macos-11,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-apple-darwin-MinSizeRel.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-darwin-macho,
             }
           - { target: x86_64-apple-darwin, os: macos-11 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
@@ -59,6 +62,7 @@ jobs:
               os: ubuntu-20.04,
               use-cross: true,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnueabihf,
             }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
@@ -97,7 +101,7 @@ jobs:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-      - name: Cross build LLVM
+      - name: Cross build LLVM (ARM)
         if: ${{ matrix.job.native-installation }}
         uses: ./
         with:
