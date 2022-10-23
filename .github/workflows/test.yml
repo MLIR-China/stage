@@ -41,7 +41,7 @@ jobs:
               use-cross: true,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
               LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnueabihf,
-              CMAKE_TOOLCHAIN_FILE: ncnn/toolchains/arm-linux-gnueabi.toolchain.cmake,
+              CMAKE_TOOLCHAIN_FILE: toolchains/arm-linux-gnueabi.toolchain.cmake,
             }
           - {
               target: aarch64-unknown-linux-gnu,
@@ -49,14 +49,14 @@ jobs:
               use-cross: true,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-Release.zip",
               LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnu,
-              CMAKE_TOOLCHAIN_FILE: ncnn/toolchains/aarch64-linux-gnu.toolchain.cmake,
+              CMAKE_TOOLCHAIN_FILE: toolchains/aarch64-linux-gnu.toolchain.cmake,
             }
           - {
               target: aarch64-apple-darwin,
               os: macos-11,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-apple-darwin-MinSizeRel.zip",
               LLVM_DEFAULT_TARGET_TRIPLE: arm-darwin-macho,
-              CMAKE_TOOLCHAIN_FILE: ncnn/toolchains/iosxc-arm64.toolchain.cmake,
+              CMAKE_TOOLCHAIN_FILE: toolchains/iosxc-arm64.toolchain.cmake,
             }
           - { target: x86_64-apple-darwin, os: macos-11 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
