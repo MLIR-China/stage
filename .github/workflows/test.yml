@@ -39,19 +39,26 @@ jobs:
               target: arm-unknown-linux-gnueabihf,
               os: ubuntu-20.04,
               use-cross: true,
+              native-installation: "https://...",
             }
           - {
               target: aarch64-unknown-linux-gnu,
               os: ubuntu-20.04,
               use-cross: true,
+              native-installation: "https://...",
             }
-          - { target: aarch64-apple-darwin, os: macos-11 }
+          - {
+              target: aarch64-apple-darwin,
+              os: macos-11,
+              native-installation: "https://...",
+            }
           - { target: x86_64-apple-darwin, os: macos-11 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
           - {
               target: x86_64-unknown-linux-musl,
               os: ubuntu-20.04,
               use-cross: true,
+              native-installation: "https://...",
             }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
@@ -70,6 +77,13 @@ jobs:
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           esac
       - uses: seanmiddleditch/gha-setup-ninja@master
+      # - name: Download pre-build LLVM
+      #   if: ${{ matrix.job.native-installation }}
+      #   run: |
+      #     wget --progress=bar:force:noscroll ${{ matrix.job.native-installation }} -O llvm-install.zip
+      #     unzip llvm-install.zip -d $HOME/native-llvm-install
+      #     rm llvm-install.zip
+      #     echo "NATIVE_LLVM_INSTALL=$HOME/native-llvm-install" >> $GITHUB_OUTPUT
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
@@ -84,7 +98,7 @@ jobs:
       - name: Zip the installation
         id: zip
         run: |
-          ARCHIVE_PATH=$(pwd)/llvm-install-${{ job.target }}-${{ matrix.build-type }}.zip
+          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.job.target }}-${{ matrix.build-type }}.zip
           cd $HOME/llvm-install
           zip -r ${ARCHIVE_PATH} .
           echo ::set-output name=ARCHIVE_PATH::${ARCHIVE_PATH}
