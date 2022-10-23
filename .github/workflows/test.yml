@@ -90,11 +90,25 @@ jobs:
           repository: llvm/llvm-project
           path: llvm-project
           ref: main
-      - uses: ./
+      - name: Build LLVM
+        if: ${{ !matrix.job.native-installation }}
+        uses: ./
         with:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      - name: Cross build LLVM
+        if: ${{ matrix.job.native-installation }}
+        uses: ./
+        with:
+          llvm-project-root-dir: llvm-project
+          cmake-args: |
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+            -DLLVM_TABLEGEN=$LLVM_NATIVE_BUILD/bin/llvm-tblgen
+            -DCLANG_TABLEGEN=$LLVM_NATIVE_BUILD/bin/clang-tblgen
+            -DMLIR_TABLEGEN=$LLVM_NATIVE_BUILD/bin/mlir-tblgen
+            -DMLIR_LINALG_ODS_GEN=$LLVM_NATIVE_BUILD/bin/mlir-linalg-ods-gen
+            -DMLIR_LINALG_ODS_YAML_GEN=$LLVM_NATIVE_BUILD/bin/mlir-linalg-ods-yaml-gen
       - name: Zip the installation
         id: zip
         run: |
