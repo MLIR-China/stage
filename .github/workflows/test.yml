@@ -83,6 +83,7 @@ jobs:
       - uses: seanmiddleditch/gha-setup-ninja@master
       - name: Download pre-build LLVM
         if: ${{ matrix.job.native-installation }}
+        id: native
         run: |
           wget --progress=bar:force:noscroll ${{ matrix.job.native-installation }} -O llvm-install.zip
           unzip llvm-install.zip -d $HOME/native-llvm-install
@@ -108,11 +109,11 @@ jobs:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-            -DLLVM_TABLEGEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/llvm-tblgen
-            -DCLANG_TABLEGEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/clang-tblgen
-            -DMLIR_TABLEGEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/mlir-tblgen
-            -DMLIR_LINALG_ODS_GEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/mlir-linalg-ods-gen
-            -DMLIR_LINALG_ODS_YAML_GEN=${{ env.NATIVE_LLVM_INSTALL }}/bin/mlir-linalg-ods-yaml-gen
+            -DLLVM_TABLEGEN=${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}/bin/llvm-tblgen
+            -DCLANG_TABLEGEN=${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}/bin/clang-tblgen
+            -DMLIR_TABLEGEN=${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}/bin/mlir-tblgen
+            -DMLIR_LINALG_ODS_GEN=${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}/bin/mlir-linalg-ods-gen
+            -DMLIR_LINALG_ODS_YAML_GEN=${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}/bin/mlir-linalg-ods-yaml-gen
             -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
             -DLLVM_TARGET_ARCH=ARM
             -DLLVM_TARGETS_TO_BUILD=ARM
@@ -122,7 +123,7 @@ jobs:
           ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.job.target }}-${{ matrix.build-type }}.zip
           cd $HOME/llvm-install
           zip -r ${ARCHIVE_PATH} .
-          echo ::set-output name=ARCHIVE_PATH::${ARCHIVE_PATH}
+          echo "ARCHIVE_PATH=${ARCHIVE_PATH}" >> $GITHUB_OUTPUT
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
