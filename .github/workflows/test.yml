@@ -115,7 +115,7 @@ jobs:
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: Cross build LLVM (ARM)
-        if: ${{ matrix.job.native-installation }}
+        if: ${{ matrix.job.native-installation && startsWith(runner.os, 'Linux') }}
         uses: ./
         with:
           llvm-project-root-dir: llvm-project
@@ -126,6 +126,18 @@ jobs:
             -DLLVM_TARGET_ARCH=ARM
             -DLLVM_TARGETS_TO_BUILD=ARM
             -DCMAKE_TOOLCHAIN_FILE=${{ steps.ncnn.outputs.NCNN_SRC }}/${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
+      - name: Cross build LLVM (ARM)
+        if: ${{ matrix.job.native-installation && startsWith(runner.os, 'macOS') }}
+        uses: ./
+        with:
+          llvm-project-root-dir: llvm-project
+          native-llvm-install-dir: ${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}
+          cmake-args: |
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+            -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
+            -DLLVM_TARGET_ARCH=ARM
+            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DCMAKE_SYSTEM_PROCESSOR=arm64 -DCMAKE_OSX_ARCHITECTURES=arm64
       - name: Zip the installation
         id: zip
         run: |
