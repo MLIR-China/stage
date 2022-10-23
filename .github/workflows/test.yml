@@ -103,7 +103,6 @@ jobs:
         with:
           repository: Tencent/ncnn
           path: ncnn
-          ref: main
       - name: Build LLVM
         if: ${{ !matrix.job.native-installation }}
         uses: ./
