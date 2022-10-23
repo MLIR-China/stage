@@ -137,7 +137,9 @@ jobs:
             -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
             -DLLVM_TARGET_ARCH=ARM
             -DLLVM_TARGETS_TO_BUILD=ARM
-            -DCMAKE_SYSTEM_PROCESSOR=arm64 -DCMAKE_OSX_ARCHITECTURES=arm64
+            -DCMAKE_CROSSCOMPILING=ON
+            -DCMAKE_SYSTEM_PROCESSOR=arm64
+            -DCMAKE_OSX_ARCHITECTURES=arm64
       - name: Zip the installation
         id: zip
         run: |
