@@ -83,11 +83,11 @@ jobs:
           swap-size-gb: 8
       - uses: actions/checkout@v2
       - name: Install prerequisites (gnueabihf)
-        if: ${{ matrix.job.target == "arm-unknown-linux-gnueabihf" }}
+        if: ${{ matrix.job.target == 'arm-unknown-linux-gnueabihf' }}
         shell: bash
         run: sudo apt-get -y install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
       - name: Install prerequisites (aarch64-unknown-linux-gnu)
-        if: ${{ matrix.job.target == "aarch64-unknown-linux-gnu" }}
+        if: ${{ matrix.job.target == 'aarch64-unknown-linux-gnu' }}
         shell: bash
         run: sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - uses: seanmiddleditch/gha-setup-ninja@master
