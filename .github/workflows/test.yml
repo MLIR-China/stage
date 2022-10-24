@@ -23,10 +23,19 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       formatted_date: ${{ steps.date.outputs.formatted_date }}
+      LLVM_COMMIT: ${{ steps.llvm.outputs.LLVM_COMMIT }}
     steps:
+      - name: Checkout llvm/llvm-project
+        uses: actions/checkout@v2
+        with:
+          repository: llvm/llvm-project
+          ref: main
       - name: Get current date
         id: date
-        run: echo "::set-output name=formatted_date::$(date +'%Y-%m-%d-%H%M')"
+        run: echo "formatted_date=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
+      - name: Get commit
+        id: llvm
+        run: echo "LLVM_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
   test: # make sure the action works on a clean machine without building
     runs-on: ${{ matrix.job.os }}
     needs: [generate_id]
@@ -105,7 +114,7 @@ jobs:
         with:
           repository: llvm/llvm-project
           path: llvm-project
-          ref: main
+          ref: ${{ needs.generate_id.outputs.LLVM_COMMIT }}
       - name: Build LLVM
         if: ${{ !matrix.job.native-installation }}
         uses: ./
@@ -151,3 +160,4 @@ jobs:
         with:
           files: ${{ steps.zip.outputs.ARCHIVE_PATH }}
           tag_name: nightly-tag-${{ needs.generate_id.outputs.formatted_date }}
+          body: "LLVM_COMMIT: ${{ needs.generate_id.outputs.LLVM_COMMIT }}"
