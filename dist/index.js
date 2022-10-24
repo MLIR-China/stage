@@ -92,7 +92,8 @@ function run() {
                     `-DCLANG_TABLEGEN=${nativeLLVMInstallDir}/bin/clang-tblgen`,
                     `-DMLIR_TABLEGEN=${nativeLLVMInstallDir}/bin/mlir-tblgen`,
                     `-DMLIR_LINALG_ODS_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-gen`,
-                    `-DMLIR_LINALG_ODS_YAML_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-yaml-gen`
+                    `-DMLIR_LINALG_ODS_YAML_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-yaml-gen`,
+                    `-DLLVM_INCLUDE_TESTS=OFF` // Disable tests for cross compilation because PDL exe will fail to be run
                 ];
             }
             llvmSrc = path_1.default.join(llvmSrc, 'llvm');
