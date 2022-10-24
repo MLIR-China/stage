@@ -159,5 +159,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ steps.zip.outputs.ARCHIVE_PATH }}
-          tag_name: nightly-tag-${{ needs.generate_id.outputs.formatted_date }}
+          tag_name: llvm-commit-${{ needs.generate_id.outputs.LLVM_COMMIT }}-${{ needs.generate_id.outputs.formatted_date }}
           body: "LLVM_COMMIT: ${{ needs.generate_id.outputs.LLVM_COMMIT }}"
