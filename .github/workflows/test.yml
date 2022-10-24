@@ -82,15 +82,16 @@ jobs:
         with:
           swap-size-gb: 8
       - uses: actions/checkout@v2
-      - name: Install prerequisites
+      - name: Install prerequisites (gnueabihf)
+        if: ${{ matrix.job.target == "arm-unknown-linux-gnueabihf" }}
         shell: bash
-        run: |
-          case ${{ matrix.job.target }} in
-            arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
-            aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
-          esac
+        run: sudo apt-get -y install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+      - name: Install prerequisites (aarch64-unknown-linux-gnu)
+        if: ${{ matrix.job.target == "aarch64-unknown-linux-gnu" }}
+        shell: bash
+        run: sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Download pre-build LLVM
+      - name: Download native pre-build LLVM
         if: ${{ matrix.job.native-installation }}
         id: native
         run: |
