@@ -49,7 +49,7 @@ jobs:
               use-cross: true,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-MinSizeRel.zip",
               LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnueabihf,
-              CMAKE_TOOLCHAIN_FILE: toolchains/arm-linux-gnueabi.toolchain.cmake,
+              CMAKE_TOOLCHAIN_FILE: toolchains/arm-linux-gnueabihf.toolchain.cmake,
             }
           - {
               target: aarch64-unknown-linux-gnu,
