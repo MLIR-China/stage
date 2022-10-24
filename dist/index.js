@@ -99,9 +99,9 @@ function run() {
             llvmSrc = path_1.default.join(llvmSrc, 'llvm');
             yield exec.exec('cmake', ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']
                 .concat(cmakeArgs())
-                .concat(userCmakeArgs)
                 .concat(prefixArgs())
-                .concat(crossArgs));
+                .concat(crossArgs)
+                .concat(userCmakeArgs));
             yield exec.exec('cmake', ['--build', buildDir, '-t', 'install']);
         }
         catch (error) {
