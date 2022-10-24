@@ -123,7 +123,7 @@ jobs:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-      - name: Cross build LLVM (ARM)
+      - name: Cross build LLVM (ARM Linux)
         if: ${{ matrix.job.native-installation && startsWith(runner.os, 'Linux') }}
         uses: ./
         with:
@@ -135,7 +135,7 @@ jobs:
             -DLLVM_TARGET_ARCH=ARM
             -DLLVM_TARGETS_TO_BUILD=ARM
             -DCMAKE_TOOLCHAIN_FILE=${{ steps.ncnn.outputs.NCNN_SRC }}/${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
-      - name: Cross build LLVM (ARM)
+      - name: Cross build LLVM (ARM macOS)
         if: ${{ matrix.job.native-installation && startsWith(runner.os, 'macOS') }}
         uses: ./
         with:
