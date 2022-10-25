@@ -23,19 +23,58 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       formatted_date: ${{ steps.date.outputs.formatted_date }}
+      LLVM_COMMIT: ${{ steps.llvm.outputs.LLVM_COMMIT }}
     steps:
+      - name: Checkout llvm/llvm-project
+        uses: actions/checkout@v2
+        with:
+          repository: llvm/llvm-project
+          ref: main
       - name: Get current date
         id: date
-        run: echo "::set-output name=formatted_date::$(date +'%Y-%m-%d-%H%M')"
+        run: echo "formatted_date=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
+      - name: Get commit
+        id: llvm
+        run: echo "LLVM_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
   test: # make sure the action works on a clean machine without building
     runs-on: ${{ matrix.job.os }}
     needs: [generate_id]
     strategy:
       fail-fast: false
       matrix:
-        build-type: ["Release", "MinSizeRel"]
         job:
+          - {
+              target: arm-unknown-linux-gnueabihf,
+              os: ubuntu-20.04,
+              use-cross: true,
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-MinSizeRel.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnueabihf,
+              CMAKE_TOOLCHAIN_FILE: toolchains/arm-linux-gnueabihf.toolchain.cmake,
+            }
+          - {
+              target: aarch64-unknown-linux-gnu,
+              os: ubuntu-20.04,
+              use-cross: true,
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-unknown-linux-gnu-MinSizeRel.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-linux-gnu,
+              CMAKE_TOOLCHAIN_FILE: toolchains/aarch64-linux-gnu.toolchain.cmake,
+            }
+          - {
+              target: aarch64-apple-darwin,
+              os: macos-11,
+              native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-apple-darwin-MinSizeRel.zip",
+              LLVM_DEFAULT_TARGET_TRIPLE: arm-darwin-macho,
+            }
+          - { target: x86_64-apple-darwin, os: macos-11 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
+          # - {
+          #     target: x86_64-unknown-linux-musl,
+          #     os: ubuntu-20.04,
+          #     use-cross: true,
+          #   }
+          # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
+          # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
+        build-type: ["Release", "MinSizeRel"]
     steps:
       - name: Set Swap Space
         if: ${{ startsWith(runner.os, 'Linux') }}
@@ -43,29 +82,83 @@ jobs:
         with:
           swap-size-gb: 8
       - uses: actions/checkout@v2
+      - name: Install prerequisites (gnueabihf)
+        if: ${{ matrix.job.target == 'arm-unknown-linux-gnueabihf' }}
+        shell: bash
+        run: sudo apt-get -y install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+      - name: Install prerequisites (aarch64-unknown-linux-gnu)
+        if: ${{ matrix.job.target == 'aarch64-unknown-linux-gnu' }}
+        shell: bash
+        run: sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - uses: seanmiddleditch/gha-setup-ninja@master
-      - run: |
-          sudo apt install -y ccache
+      - name: Download native pre-build LLVM
+        if: ${{ matrix.job.native-installation }}
+        id: native
+        run: |
+          wget --progress=bar:force:noscroll ${{ matrix.job.native-installation }} -O llvm-install.zip
+          unzip llvm-install.zip -d $HOME/native-llvm-install
+          rm llvm-install.zip
+          echo "NATIVE_LLVM_INSTALL=$HOME/native-llvm-install" >> $GITHUB_OUTPUT
+      - name: Checkout Tencent/ncnn
+        uses: actions/checkout@v2
+        if: ${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
+        with:
+          repository: Tencent/ncnn
+          path: ncnn
+      - name: Set nccn path
+        if: ${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
+        id: ncnn
+        run: |
+          echo "NCNN_SRC=$PWD/ncnn" >> $GITHUB_OUTPUT
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
           repository: llvm/llvm-project
           path: llvm-project
-          ref: main
-      - uses: ./
+          ref: ${{ needs.generate_id.outputs.LLVM_COMMIT }}
+      - name: Build LLVM
+        if: ${{ !matrix.job.native-installation }}
+        uses: ./
         with:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      - name: Cross build LLVM (ARM Linux)
+        if: ${{ matrix.job.native-installation && startsWith(runner.os, 'Linux') }}
+        uses: ./
+        with:
+          llvm-project-root-dir: llvm-project
+          native-llvm-install-dir: ${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}
+          cmake-args: |
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+            -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
+            -DLLVM_TARGET_ARCH=ARM
+            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DCMAKE_TOOLCHAIN_FILE=${{ steps.ncnn.outputs.NCNN_SRC }}/${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
+      - name: Cross build LLVM (ARM macOS)
+        if: ${{ matrix.job.native-installation && startsWith(runner.os, 'macOS') }}
+        uses: ./
+        with:
+          llvm-project-root-dir: llvm-project
+          native-llvm-install-dir: ${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}
+          cmake-args: |
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+            -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
+            -DLLVM_TARGET_ARCH=ARM
+            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DCMAKE_CROSSCOMPILING=ON
+            -DCMAKE_SYSTEM_PROCESSOR=arm64
+            -DCMAKE_OSX_ARCHITECTURES=arm64
       - name: Zip the installation
         id: zip
         run: |
-          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.build-type }}.zip
+          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.job.target }}-${{ matrix.build-type }}.zip
           cd $HOME/llvm-install
           zip -r ${ARCHIVE_PATH} .
-          echo ::set-output name=ARCHIVE_PATH::${ARCHIVE_PATH}
+          echo "ARCHIVE_PATH=${ARCHIVE_PATH}" >> $GITHUB_OUTPUT
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ steps.zip.outputs.ARCHIVE_PATH }}
-          tag_name: nightly-tag-${{ needs.generate_id.outputs.formatted_date }}
+          tag_name: llvm-commit-${{ needs.generate_id.outputs.LLVM_COMMIT }}-${{ needs.generate_id.outputs.formatted_date }}
+          body: "LLVM_COMMIT: ${{ needs.generate_id.outputs.LLVM_COMMIT }}"

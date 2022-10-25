@@ -6,8 +6,6 @@ function cmakeArgs(): string[] {
   return [
     '-DLLVM_ENABLE_PROJECTS=mlir',
     '-DLLVM_TARGETS_TO_BUILD=host',
-    '-DCMAKE_C_COMPILER_LAUNCHER=ccache',
-    '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache',
     '-DLLVM_ENABLE_ASSERTIONS=ON',
     '-DLLVM_ENABLE_OCAMLDOC=OFF',
     '-DLLVM_ENABLE_BINDINGS=OFF',
@@ -28,6 +26,9 @@ async function run(): Promise<void> {
     let llvmSrc: string = core.getInput('llvm-project-root-dir', {
       required: true
     })
+    const nativeLLVMInstallDir = core.getInput('native-llvm-install-dir', {
+      required: false
+    })
     let userCmakeArgs = core.getMultilineInput('cmake-args', {
       required: false
     })
@@ -44,13 +45,25 @@ async function run(): Promise<void> {
     if (!hasBuildType) {
       userCmakeArgs = userCmakeArgs.concat('-DCMAKE_BUILD_TYPE=Release')
     }
+    let crossArgs: string[] = []
+    if (nativeLLVMInstallDir) {
+      crossArgs = [
+        `-DLLVM_TABLEGEN=${nativeLLVMInstallDir}/bin/llvm-tblgen`,
+        `-DCLANG_TABLEGEN=${nativeLLVMInstallDir}/bin/clang-tblgen`,
+        `-DMLIR_TABLEGEN=${nativeLLVMInstallDir}/bin/mlir-tblgen`,
+        `-DMLIR_LINALG_ODS_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-gen`,
+        `-DMLIR_LINALG_ODS_YAML_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-yaml-gen`,
+        `-DLLVM_INCLUDE_TESTS=OFF` // Disable tests for cross compilation because PDL exe will fail to be run
+      ]
+    }
     llvmSrc = path.join(llvmSrc, 'llvm')
     await exec.exec(
       'cmake',
       ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']
         .concat(cmakeArgs())
-        .concat(userCmakeArgs)
         .concat(prefixArgs())
+        .concat(crossArgs)
+        .concat(userCmakeArgs)
     )
     await exec.exec('cmake', ['--build', buildDir, '-t', 'install'])
   } catch (error) {
