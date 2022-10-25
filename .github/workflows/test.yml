@@ -36,7 +36,7 @@ jobs:
       - name: Get commit
         id: llvm
         run: echo "LLVM_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-  test: # make sure the action works on a clean machine without building
+  test:
     runs-on: ${{ matrix.job.os }}
     needs: [generate_id]
     strategy:
@@ -63,7 +63,7 @@ jobs:
               target: aarch64-apple-darwin,
               os: macos-11,
               native-installation: "https://github.com/MLIR-China/stage/releases/download/nightly-tag-2022-10-23-0917/llvm-install-x86_64-apple-darwin-MinSizeRel.zip",
-              LLVM_DEFAULT_TARGET_TRIPLE: arm-darwin-macho,
+              LLVM_DEFAULT_TARGET_TRIPLE: arm64-apple-macos,
             }
           - { target: x86_64-apple-darwin, os: macos-11 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-20.04 }
@@ -74,7 +74,7 @@ jobs:
           #   }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
-        build-type: ["Release", "MinSizeRel"]
+        build-type: ["Release"]
     steps:
       - name: Set Swap Space
         if: ${{ startsWith(runner.os, 'Linux') }}
@@ -132,8 +132,9 @@ jobs:
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
             -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
-            -DLLVM_TARGET_ARCH=ARM
-            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DLLVM_HOST_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
+            -DLLVM_TARGET_ARCH=ARM;AArch64
+            -DLLVM_TARGETS_TO_BUILD=ARM;AArch64
             -DCMAKE_TOOLCHAIN_FILE=${{ steps.ncnn.outputs.NCNN_SRC }}/${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
       - name: Cross build LLVM (ARM macOS)
         if: ${{ matrix.job.native-installation && startsWith(runner.os, 'macOS') }}
@@ -144,8 +145,9 @@ jobs:
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
             -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
-            -DLLVM_TARGET_ARCH=ARM
-            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DLLVM_HOST_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
+            -DLLVM_TARGET_ARCH=AArch64
+            -DLLVM_TARGETS_TO_BUILD=AArch64
             -DCMAKE_CROSSCOMPILING=ON
             -DCMAKE_SYSTEM_PROCESSOR=arm64
             -DCMAKE_OSX_ARCHITECTURES=arm64
