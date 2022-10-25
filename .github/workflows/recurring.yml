@@ -142,10 +142,10 @@ jobs:
       - name: Zip the installation
         id: zip
         run: |
-          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.build-type }}.zip
+          ARCHIVE_PATH=$(pwd)/llvm-install-${{ matrix.job.target }}-${{ matrix.build-type }}.zip
           cd $HOME/llvm-install
           zip -r ${ARCHIVE_PATH} .
-          echo ::set-output name=ARCHIVE_PATH::${ARCHIVE_PATH}
+          echo "ARCHIVE_PATH=${ARCHIVE_PATH}" >> $GITHUB_OUTPUT
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
