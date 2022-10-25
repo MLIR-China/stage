@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "Build LLVM/MLIR"
+description: "Build LLVM from source"
+author: "MLIR-China"
 inputs:
-  milliseconds: # change this
+  llvm-project-root-dir:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: "llvm source directory"
+  native-llvm-install-dir:
+    required: true
+    description: "native llvm installation used in cross compiling"
+  cmake-args:
+    required: false
+    description: "cmake arguments"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"

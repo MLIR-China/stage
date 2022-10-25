@@ -1,23 +1,14 @@
-name: "Build and release"
-on: # rebuild any PRs and main branch changes
-  pull_request:
+name: Auto release
+
+on:
+  schedule:
+    # every 3 hours
+    - cron: "0 */3 * * *"
   push:
     branches:
       - main
       - "releases/*"
-concurrency:
-  group: stage-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          npm install
-      - run: |
-          npm run all
   generate_id:
     name: Generate ID of release
     runs-on: ubuntu-latest
@@ -36,7 +27,7 @@ jobs:
       - name: Get commit
         id: llvm
         run: echo "LLVM_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-  test:
+  release:
     runs-on: ${{ matrix.job.os }}
     needs: [generate_id]
     strategy:
@@ -74,14 +65,13 @@ jobs:
           #   }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
-        build-type: ["Release"]
+        build-type: ["Release", "MinSizeRel"]
     steps:
       - name: Set Swap Space
         if: ${{ startsWith(runner.os, 'Linux') }}
         uses: pierotofy/set-swap-space@v1.0
         with:
           swap-size-gb: 8
-      - uses: actions/checkout@v2
       - name: Install prerequisites (gnueabihf)
         if: ${{ matrix.job.target == 'arm-unknown-linux-gnueabihf' }}
         shell: bash
@@ -118,14 +108,14 @@ jobs:
           ref: ${{ needs.generate_id.outputs.LLVM_COMMIT }}
       - name: Build LLVM
         if: ${{ !matrix.job.native-installation }}
-        uses: ./
+        uses: MLIR-China/stage@main
         with:
           llvm-project-root-dir: llvm-project
           cmake-args: |
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: Cross build LLVM (ARM Linux)
         if: ${{ matrix.job.native-installation && startsWith(runner.os, 'Linux') }}
-        uses: ./
+        uses: MLIR-China/stage@main
         with:
           llvm-project-root-dir: llvm-project
           native-llvm-install-dir: ${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}
@@ -138,7 +128,7 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=${{ steps.ncnn.outputs.NCNN_SRC }}/${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
       - name: Cross build LLVM (ARM macOS)
         if: ${{ matrix.job.native-installation && startsWith(runner.os, 'macOS') }}
-        uses: ./
+        uses: MLIR-China/stage@main
         with:
           llvm-project-root-dir: llvm-project
           native-llvm-install-dir: ${{ steps.native.outputs.NATIVE_LLVM_INSTALL }}
