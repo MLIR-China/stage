@@ -73,12 +73,31 @@ jobs:
         with:
           swap-size-gb: 8
       - uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Download native pre-build LLVM
+        if: ${{ matrix.job.native-installation }}
+        id: native
+        run: |
+          wget --progress=bar:force:noscroll ${{ matrix.job.native-installation }} -O llvm-install.zip
+          unzip llvm-install.zip -d $HOME/native-llvm-install
+          rm llvm-install.zip
+          echo "NATIVE_LLVM_INSTALL=$HOME/native-llvm-install" >> $GITHUB_OUTPUT
+      - name: Checkout Tencent/ncnn
+        uses: actions/checkout@v2
+        if: ${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
+        with:
+          repository: Tencent/ncnn
+          path: ncnn
+      - name: Set nccn path
+        if: ${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
+        id: ncnn
+        run: |
+          echo "NCNN_SRC=$PWD/ncnn" >> $GITHUB_OUTPUT
       - name: Checkout llvm/llvm-project
         uses: actions/checkout@v2
         with:
           repository: llvm/llvm-project
           path: llvm-project
-          ref: main
+          ref: ${{ needs.generate_id.outputs.LLVM_COMMIT }}
       - name: Build LLVM
         if: ${{ !matrix.job.native-installation }}
         uses: MLIR-China/stage@main
