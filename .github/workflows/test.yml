@@ -133,8 +133,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
             -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
             -DLLVM_HOST_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
-            -DLLVM_TARGET_ARCH=ARM
-            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DLLVM_TARGET_ARCH=ARM;AArch64
+            -DLLVM_TARGETS_TO_BUILD=ARM;AArch64
             -DCMAKE_TOOLCHAIN_FILE=${{ steps.ncnn.outputs.NCNN_SRC }}/${{ matrix.job.CMAKE_TOOLCHAIN_FILE }}
       - name: Cross build LLVM (ARM macOS)
         if: ${{ matrix.job.native-installation && startsWith(runner.os, 'macOS') }}
@@ -146,8 +146,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
             -DLLVM_DEFAULT_TARGET_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
             -DLLVM_HOST_TRIPLE=${{ matrix.job.LLVM_DEFAULT_TARGET_TRIPLE }}
-            -DLLVM_TARGET_ARCH=ARM
-            -DLLVM_TARGETS_TO_BUILD=ARM
+            -DLLVM_TARGET_ARCH=AArch64
+            -DLLVM_TARGETS_TO_BUILD=AArch64
             -DCMAKE_CROSSCOMPILING=ON
             -DCMAKE_SYSTEM_PROCESSOR=arm64
             -DCMAKE_OSX_ARCHITECTURES=arm64
