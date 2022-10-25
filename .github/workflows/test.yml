@@ -74,7 +74,7 @@ jobs:
           #   }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           # - { target: x86_64-pc-windows-msvc, os: windows-2019 }
-        build-type: ["Release", "MinSizeRel"]
+        build-type: ["Release"]
     steps:
       - name: Set Swap Space
         if: ${{ startsWith(runner.os, 'Linux') }}
