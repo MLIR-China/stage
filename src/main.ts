@@ -5,7 +5,6 @@ import path from 'path'
 function cmakeArgs(): string[] {
   return [
     '-DLLVM_ENABLE_PROJECTS=mlir',
-    '-DLLVM_TARGETS_TO_BUILD=host',
     '-DLLVM_ENABLE_ASSERTIONS=ON',
     '-DLLVM_ENABLE_OCAMLDOC=OFF',
     '-DLLVM_ENABLE_BINDINGS=OFF',
@@ -55,6 +54,8 @@ async function run(): Promise<void> {
         `-DMLIR_LINALG_ODS_YAML_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-yaml-gen`,
         `-DLLVM_INCLUDE_TESTS=OFF` // Disable tests for cross compilation because PDL exe will fail to be run
       ]
+    } else {
+      crossArgs = ['-DLLVM_TARGETS_TO_BUILD=host']
     }
     llvmSrc = path.join(llvmSrc, 'llvm')
     await exec.exec(

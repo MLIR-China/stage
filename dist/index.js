@@ -45,7 +45,6 @@ const path_1 = __importDefault(__nccwpck_require__(622));
 function cmakeArgs() {
     return [
         '-DLLVM_ENABLE_PROJECTS=mlir',
-        '-DLLVM_TARGETS_TO_BUILD=host',
         '-DLLVM_ENABLE_ASSERTIONS=ON',
         '-DLLVM_ENABLE_OCAMLDOC=OFF',
         '-DLLVM_ENABLE_BINDINGS=OFF',
@@ -95,6 +94,9 @@ function run() {
                     `-DMLIR_LINALG_ODS_YAML_GEN=${nativeLLVMInstallDir}/bin/mlir-linalg-ods-yaml-gen`,
                     `-DLLVM_INCLUDE_TESTS=OFF` // Disable tests for cross compilation because PDL exe will fail to be run
                 ];
+            }
+            else {
+                crossArgs = ['-DLLVM_TARGETS_TO_BUILD=host'];
             }
             llvmSrc = path_1.default.join(llvmSrc, 'llvm');
             yield exec.exec('cmake', ['-S', llvmSrc, '-B', buildDir, '-G', 'Ninja']
