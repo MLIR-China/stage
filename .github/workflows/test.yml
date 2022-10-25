@@ -36,7 +36,7 @@ jobs:
       - name: Get commit
         id: llvm
         run: echo "LLVM_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-  test: # make sure the action works on a clean machine without building
+  test:
     runs-on: ${{ matrix.job.os }}
     needs: [generate_id]
     strategy:
